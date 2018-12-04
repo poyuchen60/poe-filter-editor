@@ -1,0 +1,19 @@
+li {
+  display: block;
+  padding: 0.1px;
+  box-sizing: border-box;
+}
+
+.show {
+  background-color: lightblue;
+  border: 1px solid lightblue;
+}
+
+.hide {
+  background-color: lightpink;
+  border: 1px solid lightpink;
+}
+
+.active {
+  border-color: black;
+}
