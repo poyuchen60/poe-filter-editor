@@ -26,7 +26,7 @@ class ActionEditor extends Component{
             <Typography>編輯掉落物的外觀與行為</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Item 
+            <Item
               textColor={SetTextColor}
               borderColor={SetBorderColor}
               backgroundColor={SetBackgroundColor}

@@ -37,7 +37,6 @@ class TypeEditor extends Component{
   render(){
     const { types, classes, onChange } = this.props;
     const { Type } = conditions;
-    console.log(types);
     return <ExpansionPanel>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
         <Grid container>

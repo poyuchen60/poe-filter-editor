@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import ColorEditor from '.././ColorEditor/ColorEditor';
+import FontSizeEditor from './FontSizeEditor';
 import SwipeableViews from 'react-swipeable-views';
 import Item from '.././Item/Item';
+import { connect } from 'react-redux';
 
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -10,8 +12,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
-import Slider from '@material-ui/lab/Slider';
+
 import IconButton from '@material-ui/core/IconButton';
 
 import DoneIcon from '@material-ui/icons/Done';
@@ -20,9 +21,6 @@ import ClearIcon from '@material-ui/icons/Clear';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = ({
-  slider: {
-    padding: '22px 0'
-  },
   footer: {
     display: 'flex',
     height: '50px',
@@ -30,35 +28,42 @@ const styles = ({
     alignItems: 'center',
   },
   item: {
-    display: 'felx'
+    display: 'flex',
+    width: '90px',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 })
 
+const mapStateToProps = (state) => ({
+  focusOn: state.operationReducer.focusOn
+})
+
 class ItemBoxEditor extends Component{
+
+  static initialState = ({
+    textColor, backgroundColor, borderColor, fontSize,
+  }) => ({
+    textColor, backgroundColor, borderColor, fontSize,
+    tabIndex: 0,
+    modified: false
+  })
+
   constructor(props){
     super(props);
-    const {
-      textColor, backgroundColor, borderColor, fontSize
-    } = props;
-    this.state = {
-      textColor, backgroundColor, borderColor, fontSize,
-      tabIndex: 0,
-      modified: false
-    }
+    this.state = ItemBoxEditor.initialState(props);
+  }
+
+  componentDidUpdate = (preProps) => {
+    this.props.focusOn !== preProps.focusOn
+      && this.handleReset();
   }
   
   handleTabChange = (_event, tabIndex) => this.setState({tabIndex});
   handleColorChange = prop => color => this.setState({[prop]: color, modified: true});
   handleFontSizeChange = (_event, value) => this.setState({fontSize: {value}, modified: true});
-  handleReset = () => {
-    const {
-      textColor, backgroundColor, borderColor, fontSize
-    } = this.props;
-    this.setState({
-      textColor, backgroundColor, borderColor, fontSize,
-      modified: false
-    })
-  };
+  handleReset = () => this.setState(ItemBoxEditor.initialState(this.props))
   handleSubmit = () => {
     const { onChange } = this.props;
     const { textColor, backgroundColor, borderColor, fontSize } = this.state;
@@ -79,7 +84,8 @@ class ItemBoxEditor extends Component{
       textColor, backgroundColor, borderColor, fontSize
     } = this.state;
     const {
-      handleTabChange, handleColorChange, handleReset, handleSubmit
+      handleTabChange, handleColorChange, handleReset, handleSubmit,
+      handleFontSizeChange
     } = this;
     return <div style={{width: '520px'}}>
       <Tabs
@@ -125,17 +131,10 @@ class ItemBoxEditor extends Component{
           onColorChange={handleColorChange("textColor")}
         />
       </SwipeableViews>
-      <div>
-        <Typography>{`文字大小: ${fontSize.value}`}</Typography>
-        <Slider
-          classes={{ container: classes.slider }}
-          value={fontSize.value}
-          min={18}
-          max={45}
-          step={1}
-          onChange={this.handleFontSizeChange}
-        />
-      </div>
+      <FontSizeEditor
+        fontSize={fontSize}
+        onChange={handleFontSizeChange}
+      />
       <div className={classes.footer}>
         <div className={classes.item}>
           <Item 
@@ -166,4 +165,4 @@ class ItemBoxEditor extends Component{
   }
 }
 
-export default withStyles(styles)(ItemBoxEditor);
+export default connect(mapStateToProps)(withStyles(styles)(ItemBoxEditor));

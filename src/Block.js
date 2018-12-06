@@ -1,37 +1,42 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './block.css';
 import Item from './components/Item/Item'
-import {
-  ListItem,
-  ListItemText,
-  IconButton,
-  ListItemSecondaryAction,
-  Typography,
-  Grid
-} from '@material-ui/core';
+
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+
 import DeleteIcon from '@material-ui/icons/Delete';
 import RestoreIcon from '@material-ui/icons/Restore';
 
 
-class Block extends React.Component {
+class Block extends Component {
 
+  shouldComponentUpdate(nextProps, nextState){
+    const { active } = this.props;
+    return active || nextProps.active;
+  }
 
   render(){
-    const {focus, block, active, tainted, onRestore, onDelete} = this.props;
-    const className = block.get("display") ? "顯示" : "隱藏";
-    const color = block.get("display") ? "primary" : "error";
-    const itemProperties = 
-      ["SetTextColor", "SetBorderColor", "SetBackgroundColor", "SetFontSize"].map( p => {
-        return block.has(p) ? block.get(p).toObject() : undefined;
-      });
+    const {
+      display, description,
+      fontSize, borderColor, backgroundColor, textColor,
+      active, modified,
+      onRestore, onDelete, onFocus
+    } = this.props;
+    const className = display ? "顯示" : "隱藏";
+    const color = display ? "primary" : "error";
     const primary = <Typography variant='subtitle1'>
-      {block.get("description") || "NoTitle"}
+      {description || "NoTitle"}
     </Typography>
     const secondary = <Typography variant='subtitle2' color={color}>
       {className}
     </Typography>
     return (
-      <ListItem button style={{minHeight: '100px'}} onClick={focus} selected={active}>
+      <ListItem button style={{minHeight: '100px'}} onClick={onFocus} selected={active}>
         <Grid container xs={12} alignItems='center'>
           <Grid item xs={7}>
             <ListItemText 
@@ -42,10 +47,10 @@ class Block extends React.Component {
           </Grid>
           <Grid item xs={4} justify="center" container>
             <Item 
-              textColor={itemProperties[0]}
-              borderColor={itemProperties[1]}
-              backgroundColor={itemProperties[2]}
-              fontSize={itemProperties[3]}
+              textColor={textColor}
+              borderColor={borderColor}
+              backgroundColor={backgroundColor}
+              fontSize={fontSize}
             />
           </Grid>
           <Grid item xs={1}>
@@ -54,11 +59,11 @@ class Block extends React.Component {
 
         <ListItemSecondaryAction style={{display:'flex', flexDirection: 'column'}}>
           <IconButton
-            onClick={onDelete}
+            onClick={() => {onDelete();this.forceUpdate()}}
           ><DeleteIcon/></IconButton>
           <IconButton
-            disabled={!tainted}
-            onClick={onRestore}
+            disabled={!modified}
+            onClick={() => {onRestore();this.forceUpdate()}}
           ><RestoreIcon/></IconButton>
         </ListItemSecondaryAction>
       </ListItem>

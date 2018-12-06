@@ -20,7 +20,8 @@ class ConstraintEditor extends Component {
   constructor(props){
     super(props);
     this.state = {
-      selected: ''
+      selected: '',
+      expanded: false
     }
   }
 
@@ -30,12 +31,18 @@ class ConstraintEditor extends Component {
   handleListItemDelete = c => {
     this.props.onChange(c)(undefined);
   }
+  handlePanelClick = () => this.setState(
+    (state) => ({expanded: !state.expanded})
+  );
+  handleChipClick = (c) => this.setState(
+    {expanded: true, selected: c}
+  );
 
   render(){
     const { constraints, onChange } = this.props;
-    const { selected } = this.state;
-    return <ExpansionPanel>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+    const { selected, expanded } = this.state;
+    return <ExpansionPanel expanded={expanded}>
+      <ExpansionPanelSummary onClick={this.handlePanelClick} expandIcon={<ExpandMoreIcon />}>
         <Grid container>
           <Grid item xs={3}>
             <Typography>限制</Typography>
@@ -50,6 +57,7 @@ class ConstraintEditor extends Component {
                 key={c}
                 body={constraints[c]}
                 onDelete={() => onChange(c)(undefined)}
+                onClick={() => this.handleChipClick(c)}
               />
             )}
           </Grid>

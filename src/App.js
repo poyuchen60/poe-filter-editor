@@ -71,6 +71,15 @@ class App extends Component {
       onFileChange, onBlockFocus, onPropertyChange, onPropertiesChange,
       onDiscardChanges, onBlockDelete
     } = this.props;
+
+    const blocks = editor && editor.map( (b, index) => {
+      if(!b) return undefined;
+      const modified = tainted.get(index);
+      const block = modified || b;
+      return { modified: !!modified, block: block.toJS(), active: false }
+    }).toJS();
+    if(focusOn >= 0) blocks[focusOn].active = true;
+
     return (
       <Fragment>
         <CssBaseline />
@@ -79,9 +88,7 @@ class App extends Component {
           <Grid item xs={3}>
             <Paper style={{marginTop: '5px', height: '500px', overflowY: 'auto'}}>
               <BlockList
-                blocks={editor}
-                tainted={tainted}
-                focusOn={focusOn}
+                blocks={blocks}
                 focus={onBlockFocus}
                 onBlockRestore={onDiscardChanges}
                 onBlockDelete={onBlockDelete}
@@ -92,7 +99,6 @@ class App extends Component {
             <Paper style={{marginTop: '5px', height: '500px', overflowY: 'auto'}}>
               {focusOn >= 0 
                 && <BlockEditor
-                  key={focusOn}
                   block={(tainted.get(focusOn) || editor.get(focusOn)).toJS()}
                   onPropertyChange={onPropertyChange(focusOn)}
                   onPropertiesChange={onPropertiesChange(focusOn)}

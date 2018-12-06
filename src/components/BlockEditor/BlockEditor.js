@@ -19,10 +19,10 @@ class BlockEditor extends Component{
     }, {}))
 
     return <Fragment>
-      { Class && <ClassEditor 
+      <ClassEditor 
         selected={Class}
         onChange={onPropertyChange('Class')}
-      />}
+      />
       <ConstraintEditor
         constraints={constraints}
         onChange={onPropertyChange}
@@ -31,7 +31,7 @@ class BlockEditor extends Component{
         types={types}
         onChange={onPropertyChange}
       />
-      <ActionEditor 
+      <ActionEditor
         actions={actions}
         onChange={onPropertyChange}
         onMultiChange={onPropertiesChange}

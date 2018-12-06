@@ -76,7 +76,7 @@ export const editFilterReducer = (state=initialStateFilter, action={}) => {
     case types.DISCARD_ALL_BLOCK_CHANGES:
       return {editor, tainted: tainted.clear()};
     case types.DELETE_BLOCK:
-      return {editor: editor.delete(index), tainted: tainted.delete(index)}
+      return {editor: editor.set(index, undefined), tainted: tainted.set(index, editor.get(index))}
     default:
       return state;
   }
@@ -94,12 +94,7 @@ export const operationReducer = (state=initialStateOperation, action={}) => {
     case types.DISCARD_ALL_BLOCK_CHANGES:
       return { focusOn: -1};
     case types.DELETE_BLOCK:
-      let i;
-      if(focusOn === index)
-        i = -1;
-      else
-        i = focusOn > index ? focusOn - 1 : focusOn;
-      return { focusOn: i}
+      return focusOn === index ? { focusOn: -1 } : state;
     default:
       return state;
   }

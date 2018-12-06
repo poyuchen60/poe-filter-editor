@@ -49,7 +49,7 @@ class ColorEditor extends Component {
             color="primary"
             onClick={() => onColorChange(defaultColor)}
           >
-            新增
+            設定
           </Button>
         </div>}
         <ChromePicker

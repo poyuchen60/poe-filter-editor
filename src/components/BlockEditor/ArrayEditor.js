@@ -32,7 +32,8 @@ class ArrayEditor extends Component{
   }
   handleItemDelete = index => {
     const { onChange, selected } = this.props;
-    onChange(selected.slice(0, index).concat(selected.slice(index + 1)));
+    const newValue = selected.slice(0, index).concat(selected.slice(index + 1));
+    onChange(newValue.length === 0 ? undefined : newValue);
   }
   handleItemClick = item => {
     const index = this.props.selected.indexOf(item);
@@ -79,7 +80,7 @@ class ArrayEditor extends Component{
             <Grid item xs={12}>
               <SelectableTab
                 data={classification || []}
-                selected={selected}
+                selected={selected || []}
                 onItemClick={handleItemClick}
               />
             </Grid>
@@ -95,7 +96,7 @@ const ClassEditor = (props) => {
   return <ArrayEditor
     title='類別'
     description='編輯所要過濾的物品類別'
-    selected={selected}
+    selected={selected || []}
     classification={ItemClass}
     onChange={onChange}
   />
