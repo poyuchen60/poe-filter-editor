@@ -30,9 +30,8 @@ const BlockList = props => {
         <ListItemText primary="回復" />
       </ListItem>
       <Divider />
-      {blocks && blocks.map( (b, index) => {
-        if(!b) return undefined;
-        const { modified, active, block } = b;
+      {blocks && blocks.map( b => {
+        const { modified, active, block, id, index } = b;
         const {
           SetTextColor, SetBackgroundColor, SetBorderColor, SetFontSize,
           display, description
@@ -47,10 +46,10 @@ const BlockList = props => {
             fontSize={SetFontSize}
             display={display}
             description={description}
-            key={index}
+            key={id}
             onFocus={focus(index)}
-            onRestore={() => onBlockRestore(index)}
-            onDelete={() => onBlockDelete(index)}
+            onRestore={() => onBlockRestore(id)}
+            onDelete={() => onBlockDelete(id)}
           />
         )
       })}

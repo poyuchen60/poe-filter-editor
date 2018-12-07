@@ -15,7 +15,7 @@ import RestoreIcon from '@material-ui/icons/Restore';
 
 class Block extends Component {
 
-  shouldComponentUpdate(nextProps, nextState){
+  shouldComponentUpdate(nextProps){
     const { active } = this.props;
     return active || nextProps.active;
   }

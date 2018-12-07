@@ -40,7 +40,7 @@ const mapStateToProps = (state) => ({
   isPendding: state.readFileReducer.isPendding,
   file: state.readFileReducer.file,
   editor: state.editFilterReducer.editor,
-  tainted: state.editFilterReducer.tainted,
+  order: state.editFilterReducer.order,
   focusOn: state.operationReducer.focusOn,
 });
 
@@ -67,19 +67,30 @@ class App extends Component {
 
   render() {
     const {
-      editor, tainted, focusOn,
+      editor, focusOn, order,
       onFileChange, onBlockFocus, onPropertyChange, onPropertiesChange,
       onDiscardChanges, onBlockDelete
     } = this.props;
-
-    const blocks = editor && editor.map( (b, index) => {
-      if(!b) return undefined;
-      const modified = tainted.get(index);
-      const block = modified || b;
-      return { modified: !!modified, block: block.toJS(), active: false }
-    }).toJS();
-    if(focusOn >= 0) blocks[focusOn].active = true;
-
+    console.log(editor.get(0));
+    const blocks = order && order.toJS().reduce( (accumulator, id, index) => {
+      const block = editor.get(id);
+      return block
+        ? [...accumulator, {
+          modified: !!block.get('modified'),
+          block: (block.get('modified') || block.get('origin')).toJS(),
+          id, index, active: focusOn === index
+        }]
+        : accumulator
+    }, [])
+    // const blocks = editor && editor.map( (b, index) => {
+    //   if(!b) return undefined;
+    //   const modified = tainted.get(index);
+    //   const block = modified || b;
+    //   return { modified: !!modified, block: block.toJS(), active: false }
+    // }).toJS();
+    //if(focusOn >= 0) blocks[focusOn].active = true;
+    const id = focusOn >= 0 && order.get(focusOn);
+    const block = editor.get(id);
     return (
       <Fragment>
         <CssBaseline />
@@ -97,11 +108,11 @@ class App extends Component {
           </Grid>
           <Grid item xs={9}>
             <Paper style={{marginTop: '5px', height: '500px', overflowY: 'auto'}}>
-              {focusOn >= 0 
+              {block 
                 && <BlockEditor
-                  block={(tainted.get(focusOn) || editor.get(focusOn)).toJS()}
-                  onPropertyChange={onPropertyChange(focusOn)}
-                  onPropertiesChange={onPropertiesChange(focusOn)}
+                  block={(block.get('modified') || block.get('origin')).toJS()}
+                  onPropertyChange={onPropertyChange(id)}
+                  onPropertiesChange={onPropertiesChange(id)}
                 />
               }
             </Paper>

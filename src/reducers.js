@@ -1,6 +1,11 @@
 import { types } from './actions';
-import { List, fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 import { combineReducers } from 'redux';
+
+const construct = data => {
+  const ary = data.map( d => ({modified: undefined, origin: d}));
+  return fromJS(ary);
+}
 
 const initialStateFile = {
   file: undefined,
@@ -24,59 +29,80 @@ export const readFileReducer = (state=initialStateFile, action={}) => {
 
 
 const initialStateFilter = {
-  editor: undefined,
-  tainted: undefined
+  editor: List(),
+  order: List()
 }
 const merger = (oldVal, newVal) => newVal || oldVal;
 export const editFilterReducer = (state=initialStateFilter, action={}) => {
-  const {editor, tainted } = state;
+  const {editor, order } = state;
   const {index, property, value, type, filter, block} = action;
   let newVal;
   switch(type){
     case types.READ_FILE_SUCCESS:
-      return {editor: fromJS(filter), tainted: List()};
+      return { editor: construct(filter), order: List([...Array(filter.length).keys()]) };
     case types.CHANGE_ONE_PROPERTY:
-      return {editor, tainted: tainted.update(index,
-        b => {
-          b = b ? b : editor.get(index);
-          return value === undefined
-            ? b.delete(property)
-            : b.set(property, fromJS(value));
-        })};
+      return { order, editor: editor.update(index, b => {
+        const body = b.get('modified') || b.get('origin');
+        const modified = value === undefined
+          ? body.delete(property)
+          : body.set(property, fromJS(value));
+        return b.set('modified', modified);
+      })}
+      // return {editor, tainted: tainted.update(index,
+      //   b => {
+      //     b = b ? b : editor.get(index);
+      //     return value === undefined
+      //       ? b.delete(property)
+      //       : b.set(property, fromJS(value));
+      //   })};
     case types.CHANGE_PROPERTIES:
-      return {editor, tainted: tainted.update(index,
-        b => {
-          b = b ? b : editor.get(index);
-          Object.keys(block).forEach( k => {
-            const v = block[k]
-            if(v === undefined){
-              b = b.delete(k)
-            } else {
-              b = b.set(k, fromJS(v))
-            }
-          })
-          // block.forEach((v, k) => {
-          //   if(v === undefined){
-          //     b = b.delete(k)
-          //   } else {
-          //     b = b.set(k, fromJS(v))
-          //   }
-          // })
-          return b;
-        } )}
+      return { order, editor: editor.update(index, b => {
+        let body = b.get('modified') || b.get('origin');
+        Object.keys(block).forEach( k => {
+          const v = block[k];
+          body = v === undefined
+            ? body.delete(k)
+            : body.set(k, fromJS(v));
+        });
+        return b.set('modified', body);
+      })}
+      // return {editor, tainted: tainted.update(index,
+      //   b => {
+      //     b = b ? b : editor.get(index);
+      //     Object.keys(block).forEach( k => {
+      //       const v = block[k]
+      //       if(v === undefined){
+      //         b = b.delete(k)
+      //       } else {
+      //         b = b.set(k, fromJS(v))
+      //       }
+      //     })
+      //     return b;
+      //   } )}
     case types.SAVE_ONE_BLOCK:
-      newVal = tainted.get(index);
-      return newVal === undefined 
-        ? state
-        : {editor: editor.set(index, newVal), tainted: tainted.set(index, undefined)};
+      return { order, editor: editor.update(index, b => {
+        const body = b.get('modified') || b.get('origin');
+        return Map({ modified: undefined, origin: body });
+      })}
+      // newVal = tainted.get(index);
+      // return newVal === undefined 
+      //   ? state
+      //   : {editor: editor.set(index, newVal), tainted: tainted.set(index, undefined)};
     case types.SAVE_ALL_BLOCKS:
-      return {editor: editor.mergeWith(merger, tainted), tainted: tainted.clear()};
+      return { order, editor: editor.map( b => {
+        const body = b.get('modified') || b.get('origin');
+        return Map({ modified: undefined, origin: body });
+      })}
+      //return {editor: editor.mergeWith(merger, tainted), tainted: tainted.clear()};
     case types.DISCARD_ALL_CHANGES:
-      return {editor, tainted: tainted.set(index, undefined)};
+      return { order, editor: editor.update(index, b => b.set('modified', undefined))}
+      // return {editor, tainted: tainted.set(index, undefined)};
     case types.DISCARD_ALL_BLOCK_CHANGES:
-      return {editor, tainted: tainted.clear()};
+      return { order, editor: editor.map(b => b.set('modified', undefined))}
+      // return {editor, tainted: tainted.clear()};
     case types.DELETE_BLOCK:
-      return {editor: editor.set(index, undefined), tainted: tainted.set(index, editor.get(index))}
+      return { order, editor: editor.set(index, undefined)}
+      //return {editor: editor.set(index, undefined), tainted: tainted.set(index, editor.get(index))}
     default:
       return state;
   }
