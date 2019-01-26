@@ -23,6 +23,12 @@ class DataEditorBlock extends Component {
   state = {
     input: ''
   }
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const { input } = this.state;
+    const { items } = this.props;
+    return nextState.input !== input
+      || nextProps.items.length !== items.length;
+  };
 
   createNewItem = () => this.props.onNewItem(this.state.input);
 

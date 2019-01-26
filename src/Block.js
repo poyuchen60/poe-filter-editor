@@ -19,30 +19,49 @@ class Block extends Component {
     const { active } = this.props;
     return active || nextProps.active;
   }
+  handleFocus = () => {
+    this.props.onFocus();
+  }
+  handleDelete = () => {
+    this.props.onDelete();
+    this.forceUpdate();
+  }
+  handleRestore = () => {
+    this.props.onRestore();
+    this.forceUpdate();
+  }
 
   render(){
     const {
       display, description,
       fontSize, borderColor, backgroundColor, textColor,
-      active, modified,
-      onRestore, onDelete, onFocus
+      active, modified
     } = this.props;
+    const {
+      handleRestore, handleFocus, handleDelete
+    } = this;
     const className = display ? "顯示" : "隱藏";
     const color = display ? "primary" : "error";
-    const primary = <Typography variant='subtitle1'>
-      {description || "NoTitle"}
-    </Typography>
-    const secondary = <Typography variant='subtitle2' color={color}>
-      {className}
-    </Typography>
+    const primary = ({
+      variant: 'subtitle1'
+    });
+    const secondary = ({
+      variant: 'subtitle2',
+      color
+    });
     return (
-      <ListItem button style={{minHeight: '100px'}} onClick={onFocus} selected={active}>
-        <Grid container xs={12} alignItems='center'>
+      <ListItem
+        button style={{minHeight: '100px'}}
+        onClick={handleFocus}
+        selected={active}
+      >
+        <Grid container alignItems='center'>
           <Grid item xs={7}>
             <ListItemText 
-              primary={primary}
-              secondary={secondary}
-              disableTypography={true}
+              primary={description || "NoTitle"}
+              secondary={className}
+              primaryTypographyProps={primary}
+              secondaryTypographyProps={secondary}
             />
           </Grid>
           <Grid item xs={4} justify="center" container>
@@ -59,11 +78,11 @@ class Block extends Component {
 
         <ListItemSecondaryAction style={{display:'flex', flexDirection: 'column'}}>
           <IconButton
-            onClick={() => {onDelete();this.forceUpdate()}}
+            onClick={handleDelete}
           ><DeleteIcon/></IconButton>
           <IconButton
             disabled={!modified}
-            onClick={() => {onRestore();this.forceUpdate()}}
+            onClick={handleRestore}
           ><RestoreIcon/></IconButton>
         </ListItemSecondaryAction>
       </ListItem>

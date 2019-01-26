@@ -54,7 +54,10 @@ class ItemBoxEditor extends Component{
     super(props);
     this.state = ItemBoxEditor.initialState(props);
   }
-
+  shouldComponentUpdate = (nextProps) => {
+    const { expanded } = this.props;
+    return expanded || nextProps.expanded;
+  }
   componentDidUpdate = (preProps) => {
     this.props.focusOn !== preProps.focusOn
       && this.handleReset();
@@ -106,6 +109,8 @@ class ItemBoxEditor extends Component{
         <Grid container>
           <Grid item xs={6}>
             <ColorEditor
+              currentIndex={tabIndex}
+              index={0}
               color={backgroundColor}
               onColorChange={handleColorChange("backgroundColor")}
             />
@@ -123,10 +128,14 @@ class ItemBoxEditor extends Component{
           </Grid>
         </Grid>
         <ColorEditor
+          currentIndex={tabIndex}
+          index={1}
           color={borderColor}
           onColorChange={handleColorChange("borderColor")}
         />
         <ColorEditor
+          currentIndex={tabIndex}
+          indext={2}
           color={textColor}
           onColorChange={handleColorChange("textColor")}
         />

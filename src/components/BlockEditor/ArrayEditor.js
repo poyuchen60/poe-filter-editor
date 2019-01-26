@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ItemClass from '../../data/ItemClass.json'
+import BaseType from '../../data/BaseType.json'
 import SelectableTab from '../SelectableTab/SelectableTab';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -11,6 +12,22 @@ import Grid from '@material-ui/core/Grid';
 import Chip from '@material-ui/core/Chip';
 import Input from '@material-ui/core/Input';
 
+class ArrayEditorChip extends Component {
+  shouldComponentUpdate = () => {
+    return false;
+  }
+
+  handleDelete = () => this.props.onDelete();
+
+  render(){
+    const { name } = this.props;
+    return <Chip
+      label={name}
+      onDelete={this.handleDelete}
+      variant="outlined"
+    />
+  }
+}
 
 class ArrayEditor extends Component{
   state={
@@ -42,11 +59,12 @@ class ArrayEditor extends Component{
   render(){
     const {
       title, description, classification, selected,
+      expanded, onPanelExpand
     } = this.props;
     const { handleItemClick, handleItemDelete } = this;
     const { input } = this.state;
     return (
-      <ExpansionPanel>
+      <ExpansionPanel expanded={expanded} onChange={onPanelExpand}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Grid container>
             <Grid item xs={3}>
@@ -57,11 +75,10 @@ class ArrayEditor extends Component{
             </Grid>
             <Grid item xs={12}>
               {selected && selected.map( (i, index) => (
-                <Chip
+                <ArrayEditorChip
                   key={i}
-                  label={i}
+                  name={i}
                   onDelete={() => handleItemDelete(index)}
-                  variant="outlined"
                 />
               ))}
             </Grid>
@@ -92,8 +109,10 @@ class ArrayEditor extends Component{
 }
 
 const ClassEditor = (props) => {
-  const { selected, onChange } = props;
+  const { selected, onChange, expanded, onPanelExpand } = props;
   return <ArrayEditor
+    expanded={expanded}
+    onPanelExpand={onPanelExpand}
     title='類別'
     description='編輯所要過濾的物品類別'
     selected={selected || []}
@@ -101,6 +120,18 @@ const ClassEditor = (props) => {
     onChange={onChange}
   />
 }
+const BaseTypeEditor = (props) => {
+  const { selected, onChange, expanded, onPanelExpand } = props;
+  return <ArrayEditor
+    expanded={expanded}
+    onPanelExpand={onPanelExpand}
+    title='基底'
+    description='編輯所要過濾的物品基底'
+    selected={selected || []}
+    classification={BaseType}
+    onChange={onChange}
+  />
+}
 
 export default ArrayEditor;
-export { ClassEditor };
+export { ClassEditor, BaseTypeEditor };

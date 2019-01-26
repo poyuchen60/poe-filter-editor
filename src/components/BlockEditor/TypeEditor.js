@@ -9,12 +9,11 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
+import TrueIcon from '@material-ui/icons/Check';
+import FalseIcon from '@material-ui/icons/Close';
+import NoneIcon from '@material-ui/icons/ChangeHistory';
 
 const styles = theme => ({
   root: {
@@ -27,17 +26,61 @@ const styles = theme => ({
   }
 })
 
-class TypeEditor extends Component{
-  handleChange = (event) => {
-    let { name, value } = event.target;
-    value = value === 'none' ? undefined : (value === 'true')
-    this.props.onChange(name)(value);
+const nextValues = ({
+  'primary': true,
+  'secondary': false,
+  'default': undefined
+})
+
+const Icon = (props) => {
+  const { value } = props;
+  return value === undefined
+    ? <NoneIcon />
+    : value ? <TrueIcon /> : <FalseIcon />
+}
+
+class TypeEditorDetails extends Component{
+  shouldComponentUpdate = (nextProps, _nextState) => {
+    const { expanded } = this.props;
+    return expanded || nextProps.expanded;
   }
 
   render(){
-    const { types, classes, onChange } = this.props;
     const { Type } = conditions;
-    return <ExpansionPanel>
+    const { classes, types, onClick } = this.props;
+    return <Grid container>
+      <Grid item xs={12}>
+        <div className={classes.root}>
+          {Type.map( t => {
+            const value = types[t];
+            const color = value === undefined
+              ? 'primary'
+              : ( value ? 'secondary' : 'default');
+            const nextValue = nextValues[color];
+            return <Button
+              key={t}
+              variant="contained"
+              color={color}
+              onClick={() => onClick(t, nextValue)}
+            >
+              <Icon value={nextValue}/>
+              {t}
+            </Button>
+          })}
+        </div>
+      </Grid>
+    </Grid>
+  }
+}
+
+class TypeEditor extends Component{
+
+  handleButtonClick = (type, value) => this.props.onChange(type)(value);
+
+  render(){
+    const { types, classes, onChange, expanded, onPanelExpand } = this.props;
+    const { handleButtonClick } = this;
+    return <ExpansionPanel expanded={expanded} onChange={onPanelExpand}>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
         <Grid container>
           <Grid item xs={3}>
@@ -59,32 +102,12 @@ class TypeEditor extends Component{
         </Grid>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
-        <Grid container>
-          <Grid item xs={12}>
-            <div className={classes.root}>
-              { Type.map( t => {
-                const type = types[t];
-                return <FormControl
-                  key={t}
-                  className={classes.formControl}
-                  component="fieldset"
-                >
-                  <FormLabel component="legend">{t}</FormLabel>
-                  <RadioGroup
-                    aria-label={t}
-                    name={t}
-                    value={type !== undefined ? String(type) : 'none'}
-                    onChange={this.handleChange}
-                  >
-                    <FormControlLabel value="none" control={<Radio />} label="None" />
-                    <FormControlLabel value="true" control={<Radio color='primary' />} label="True" />
-                    <FormControlLabel value="false" control={<Radio />} label="False" />
-                  </RadioGroup>
-                </FormControl>
-              })}
-            </div>
-          </Grid>
-        </Grid>
+        <TypeEditorDetails
+          expanded={expanded}
+          classes={classes}
+          types={types}
+          onClick={handleButtonClick}
+        />
       </ExpansionPanelDetails>
     </ExpansionPanel>
   }

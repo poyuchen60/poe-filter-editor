@@ -7,6 +7,7 @@ export const types = {
   DISCARD_ONE_CHANGE: "DISCARD_ONE_CHANGE",
   DISCARD_ALL_BLOCK_CHANGES: "DISCARD_ALL_BLOCK_CHANGES",
   DELETE_BLOCK: "DELETE_BLOCK",
+  CREATE_BLOCK: "CREATE_BLOCK",
 
   FILE_CHANGE: "FILE_CHANGE",
   READ_FILE_SUCCESS: "READ_FILE_SUCCESS",
@@ -61,4 +62,7 @@ export const discardAllBlockChanges = () => ({
 export const deleteBlock = (index) => ({
   type: types.DELETE_BLOCK,
   index
+});
+export const createBlock = () => ({
+  type: types.CREATE_BLOCK
 })

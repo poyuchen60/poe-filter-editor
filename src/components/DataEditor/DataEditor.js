@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import DataEditorBlock from './DataEditorBlock';
 import SelectableTab from '../SelectableTab/SelectableTab';
 import ItemClass from '../../data/ItemClass.json';
 
-import { List, fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -18,20 +18,66 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 
+class InputTextField extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      input: ''
+    }
+  }
+  handleChange = (event) => this.setState({input: event.target.value});
+  handleClear = () => this.setState({input: ''});
+
+  render(){
+    const { input } = this.state;
+    const { onSubmit } = this.props;
+    const { handleChange, handleClear } = this;
+    return <TextField
+      value={input}
+      onChange={handleChange}
+      label="新增"
+      margin="normal"
+      variant="outlined"
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              color='primary'
+              disabled={input.length === 0}
+              onClick={() =>　onSubmit(input)}
+            >
+              <AddIcon/>
+            </IconButton>
+            <IconButton
+              color='secondary'
+              disabled={input.length === 0}
+              onClick={handleClear}
+            >
+              <ClearIcon/>
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+  }
+}
+
 
 class DataEditor extends Component {
   constructor(props){
     super(props);
     this.state = {
       input: '',
-      data: fromJS(ItemClass),
+      data: List(),
       selected: List(),
       open: false,
       dialogContent: '',
     }
-    console.log(this.state.data);
   }
-
+  shouldComponentUpdate = (nextprops) => {
+    const { hidden } = this.props;
+    return !hidden || !nextprops.hidden;
+  }
   handleItemSelect = item => {
     const { selected } = this.state;
     const index = selected.indexOf(item);
@@ -58,10 +104,9 @@ class DataEditor extends Component {
       this.setState({data: data.set(cIndex, newCategory)});
     }
   }
-  handleChange = event => this.setState({input: event.target.value});
-  handleSubmit = () => {
-    const { data, input } = this.state;
-    if(input.length > 0 && data.some( c => c.get('category') === input)){
+  handleSubmit = (input) => {
+    const { data } = this.state;
+    if(input.length > 0 && data.every( c => c.get('category') !== input)){
       this.setState({data: data.push(Map({category: input, items: List()}))});
     }
   }
@@ -73,50 +118,35 @@ class DataEditor extends Component {
     }
     return nextState;
   });
+  handleImport = (data) => {
+    data = data || fromJS(JSON.parse(this.state.dialogContent));
+    this.setState({data, open: false});
+  };
+  handleInputChange = event => this.setState({dialogContent: event.target.value});
+
+  componentDidMount = () => {
+    this.handleImport(fromJS(ItemClass));
+  }
 
   render(){
+    const { hidden } = this.props;
     const { data, selected, open, dialogContent } = this.state;
+    const { handleSubmit, handleImport, handleInputChange } = this;
     const dataArray = data.toArray().map( c => ({
       category: c.get('category'),
       items: c.get('items').toArray()
     }));
     return (
-      <Fragment>
+      <div style={{display: hidden ? 'none' : 'block'}}>
         <Button color="primary" onClick={this.handleDialogToggle}>
-          輸出
+          匯出 / 匯入
         </Button>
         <SelectableTab
           selected={selected.toArray()}
           data={dataArray}
           onItemClick={this.handleItemSelect}
         />
-        <TextField
-          value={this.state.input}
-          onChange={this.handleChange}
-          label="新增"
-          margin="normal"
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  color='primary'
-                  disabled={this.state.input.length === 0}
-                  onClick={this.handleSubmit}
-                >
-                  <AddIcon/>
-                </IconButton>
-                <IconButton
-                  color='secondary'
-                  disabled={this.state.input.length === 0}
-                  onClick={() => this.setState({input: ''})}
-                >
-                  <ClearIcon/>
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <InputTextField onSubmit={handleSubmit}/>
         {selected.map( item => 
           <Chip label={item} onDelete={() => this.handleItemSelect(item)}/>
         )}
@@ -137,15 +167,28 @@ class DataEditor extends Component {
           onClose={this.handleDialogToggle}
           scroll='paper'
           aria-labelledby="scroll-dialog-title"
+          fullWidth={true}
+          maxWidth='sm'
         >
           <DialogTitle id="scroll-dialog-title">分類</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              {dialogContent}
-            </DialogContentText>
+            <TextField
+              onChange={handleInputChange}
+              id="outlined-multiline-static"
+              label="Multiline"
+              multiline
+              rows="15"
+              value={dialogContent}
+              margin="normal"
+              variant="outlined"
+              fullWidth
+            />
+            <Button onClick={() => handleImport()} color="primary">
+              Import
+            </Button>
           </DialogContent>
         </Dialog>
-      </Fragment>    
+      </div>    
     )
   }
 }

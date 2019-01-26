@@ -13,6 +13,45 @@ const styles = theme => ({
   }
 })
 
+class SelectableListItem extends Component{
+  shouldComponentUpdate = (nextProps) => {
+    const { isSelected } = this.props;
+    return isSelected !== nextProps.isSelected;
+  }
+  render(){
+    const { onItemClick, name, isSelected, classes } = this.props;
+    return <ListItem
+      button
+      key={name}
+      onClick={onItemClick}
+    >
+      <ListItemText
+        primary={name}
+        classes={{primary: isSelected ? classes.text : ""}}
+      />
+    </ListItem>
+  }
+}
+class SelectableTabs extends Component{
+  shouldComponentUpdate = (nextPros, _nextState) => {
+    const { index } = this.props;
+    return index !== nextPros.index;
+  }
+  render(){
+    const { index, data, onChange } = this.props;
+    return <Tabs
+      value={index}
+      onChange={onChange}
+      indicatorColor="primary"
+      textColor="primary"
+      scrollable
+      scrollButtons="auto"
+    >
+      {data.map( d => <Tab key={d.category} label={d.category} />)}
+    </Tabs>
+  }
+}
+
 class SelectableTab extends Component{
   state = {
     index: 0,
@@ -27,22 +66,21 @@ class SelectableTab extends Component{
     const { data, onItemClick, classes, selected } = this.props;
     return data.length > 0 && (
       <Fragment>
-        <Tabs
-          value={index}
+        <SelectableTabs
+          index={index}
+          data={data}
           onChange={this.handleChange}
-          indicatorColor="primary"
-          textColor="primary"
-          scrollable
-          scrollButtons="auto"
-        >
-          {data.map( d => <Tab key={d.category} label={d.category} />)}
-        </Tabs>
-        <List>
-          {data.length > index && data[index].items.map(i => {
-            const isSelected = selected.includes(i);
-            return <ListItem button key={i} onClick={() => onItemClick(i)}>
-              <ListItemText primary={i} classes={{primary: isSelected ? classes.text : {}}} />
-            </ListItem>
+        />
+        <List key={index}>
+          {data.length > index && data[index].items.map(name => {
+            const isSelected = selected && selected.includes(name);
+            return <SelectableListItem
+              key={name}
+              onItemClick={() => onItemClick(name)}
+              name={name}
+              classes={classes}
+              isSelected={isSelected}
+            />
           })}
         </List>
       </Fragment>

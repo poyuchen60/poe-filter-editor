@@ -16,7 +16,7 @@ const comparison = (validation) => (str) => {
   const reg = /(<|>|<=|>=|=)? *([a-zA-Z0-9]+) *(#.+)?/;
   const match = reg.exec(str);
   const value = match && validation(match[2])
-  if(value){
+  if(value || value === 0){
     return {
       operator: match[1] || "=",
       value,
@@ -28,7 +28,11 @@ const comparison = (validation) => (str) => {
 const validNumber = (str) => Number(str);
 const validRarity = (str) => /^(Normal|Magic|Rare|Unique)$/.test(str) && str;
 
-const twoQuotes = (str) => str.split('"').map(e => e.trim()).filter(e => e.length > 0);
+const twoQuotes = (str) => {
+  const removeSpace = str.split('"').map(e => e.trim()).filter(e => e.length > 0);
+  const removeDuplicate = Array.from(new Set(removeSpace));
+  return removeDuplicate;
+};
 
 const single = validation => (str) => {
   const reg = /([a-zA-Z0-9]+) *(#.+)?/;
@@ -114,6 +118,7 @@ const handlers = {
   "GemLevel": comparison(validNumber),
   "Quality": comparison(validNumber),
   "Rarity": comparison(validRarity),
+  "MapTier": comparison(validNumber),
   "LinkedSockets": comparison(validNumber),
   "Sockets": comparison(validNumber),
   "SocketGroup": single(validSocketGroup),

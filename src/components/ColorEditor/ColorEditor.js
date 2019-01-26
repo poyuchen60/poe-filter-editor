@@ -36,8 +36,16 @@ const defaultColor = ({
 })
 
 class ColorEditor extends Component {
+
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const { index } = this.props;
+    return nextProps.currentIndex === index;
+  }
+
   render(){
-    const { color, onColorChange, classes } = this.props
+    const {
+      color, onColorChange, classes,
+    } = this.props
     const bgColor = color
       ? `rgba(${color.r}, ${color.g}, ${color.b})`
       : "rgba(0, 0, 0, 1)";

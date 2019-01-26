@@ -1,9 +1,12 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Input, Button } from '@material-ui/core';
 
+import AddIcon from '@material-ui/icons/Add';
+import IconButton from '@material-ui/core/IconButton';
+
 
 const Header = (props) => {
-  const { onFileChange, onSubmit } = props;
+  const { onFileChange, onSubmit, onCreateBlock, onDataEditorOpen } = props;
   return (
     <AppBar position="static">
       <Toolbar>
@@ -16,6 +19,14 @@ const Header = (props) => {
           color="secondary"
           variant="contained"
         >Parse</Button>
+        <IconButton color="inherit" onClick={onCreateBlock}>
+          <AddIcon />
+        </IconButton>
+        <Button
+          onClick={onDataEditorOpen}
+          color="inherit"
+          variant="contained"
+        >Data</Button>
       </Toolbar>
     </AppBar>
   )

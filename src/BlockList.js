@@ -13,11 +13,12 @@ import RestoreIcon from '@material-ui/icons/Restore';
 const BlockList = props => {
   const {
     blocks,
-    focus, onBlockRestore, onBlockDelete
+    focus, onBlockRestore, onBlockDelete, onDownload
   } = props;
   return (
+    <div>
     <List>
-      <ListItem button>
+      <ListItem button onClick={onDownload}>
         <ListItemIcon>
           <SaveIcon />
         </ListItemIcon>
@@ -54,6 +55,7 @@ const BlockList = props => {
         )
       })}
     </List>
+    </div>
   )
 }
 

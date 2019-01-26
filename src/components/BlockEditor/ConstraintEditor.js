@@ -16,6 +16,44 @@ import IconButton from '@material-ui/core/IconButton';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 
+class ConstraintEditorDetails extends Component {
+  shouldComponentUpdate = (nextProps) => this.props.expanded || nextProps.expanded;
+
+  render(){
+    const {
+      constraints, selected,
+      onChange, onListItemClick, onListItemDelete
+    } = this.props;
+    return <Grid container>
+      <Grid item xs={6}>
+        <ConstraintForm 
+          constraint={selected}
+          body={constraints[selected]}
+          key={selected}
+          onChange={onChange}
+        />
+        <List>
+          { Object.keys(constraints).map( c => {
+            const { value, operator } = constraints[c];
+            return <ListItem
+              button
+              key={c}
+              onClick={() => onListItemClick(c)}
+            >
+              <ListItemText primary={`${c} ${operator} ${value}`} />
+              <ListItemSecondaryAction>
+                <IconButton onClick={() => onListItemDelete(c)}>
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          })}
+        </List>
+      </Grid>
+    </Grid>
+  }
+}
+
 class ConstraintEditor extends Component {
   constructor(props){
     super(props);
@@ -31,18 +69,18 @@ class ConstraintEditor extends Component {
   handleListItemDelete = c => {
     this.props.onChange(c)(undefined);
   }
-  handlePanelClick = () => this.setState(
-    (state) => ({expanded: !state.expanded})
-  );
-  handleChipClick = (c) => this.setState(
-    {expanded: true, selected: c}
-  );
+
+  handleChipClick = (c) => {
+    this.props.onPanelExpand(undefined, true);
+    this.setState({selected: c});
+  }
 
   render(){
-    const { constraints, onChange } = this.props;
-    const { selected, expanded } = this.state;
-    return <ExpansionPanel expanded={expanded}>
-      <ExpansionPanelSummary onClick={this.handlePanelClick} expandIcon={<ExpandMoreIcon />}>
+    const { constraints, onChange, expanded, onPanelExpand } = this.props;
+    const { selected } = this.state;
+    const { handleListItemClick, handleListItemDelete } = this;
+    return <ExpansionPanel expanded={expanded} onChange={onPanelExpand}>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
         <Grid container>
           <Grid item xs={3}>
             <Typography>限制</Typography>
@@ -64,33 +102,14 @@ class ConstraintEditor extends Component {
         </Grid>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
-        <Grid container >
-          <Grid item xs={6}>
-            <ConstraintForm 
-              constraint={selected}
-              body={constraints[selected]}
-              key={selected}
-              onChange={onChange}
-            />
-            <List>
-              { Object.keys(constraints).map( c => {
-                const { value, operator } = constraints[c];
-                return <ListItem
-                  button
-                  key={c}
-                  onClick={() => this.handleListItemClick(c)}
-                >
-                  <ListItemText primary={`${c} ${operator} ${value}`} />
-                  <ListItemSecondaryAction>
-                    <IconButton onClick={() => this.handleListItemDelete(c)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              })}
-            </List>
-          </Grid>
-        </Grid>
+        <ConstraintEditorDetails
+          expanded={expanded}
+          selected={selected}
+          constraints={constraints}
+          onChange={onChange}
+          onListItemClick={handleListItemClick}
+          onListItemDelete={handleListItemDelete}
+        />
       </ExpansionPanelDetails>
     </ExpansionPanel>
   }

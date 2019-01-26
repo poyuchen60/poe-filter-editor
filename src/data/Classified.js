@@ -1,10 +1,16 @@
 const conditions =  {
+  "Basic":[
+    "description", "display"
+  ],
   "Constraint":[
     "MapTier", "Quality", "Rarity", "Height", "Width", "StackSize",
     "GemLevel", "ItemLevel", "DropLevel"
   ],
-  "Array": [
+  "Ary": [
     "Class", "BaseType", "HasExplicitMod"
+  ],
+  "Socket":[
+    "Sockets", "LinkedSockets", "SocketGroup"
   ],
   "Type": [
     "Identified", "Corrupted",
