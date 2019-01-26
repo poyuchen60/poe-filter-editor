@@ -135,7 +135,7 @@ class ItemBoxEditor extends Component{
         />
         <ColorEditor
           currentIndex={tabIndex}
-          indext={2}
+          index={2}
           color={textColor}
           onColorChange={handleColorChange("textColor")}
         />

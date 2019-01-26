@@ -2,10 +2,12 @@
   "name": "poe-filter-editor",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://poyuchen60.github.io/poe-filter-editor",
   "dependencies": {
     "@material-ui/core": "3.3.2",
     "@material-ui/icons": "^3.0.1",
     "@material-ui/lab": "^3.0.0-alpha.24",
+    "gh-pages": "^2.0.1",
     "immutable": "^3.8.2",
     "react": "^16.5.2",
     "react-color": "^2.14.1",
@@ -17,6 +19,8 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
