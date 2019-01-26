@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Grid, CssBaseline, Paper } from '@material-ui/core';
 import Header from './Header';
-import DataEditor from './components/DataEditor/DataEditor';
 import Builder from './Builder';
 
 import BlockList from './BlockList';
@@ -65,9 +64,6 @@ class App extends Component {
   constructor(props){
     super(props);
     this.linkRef = React.createRef();
-    this.state = {
-      dataEditorOpen: false,
-    }
   }
 
   handleSubmit = (event) => {
@@ -89,9 +85,6 @@ class App extends Component {
     linkNode.download = "test.filter";
     linkNode.click();
   };
-  handleDataEditorOpen = () => this.setState((state) => ({
-    dataEditorOpen: !state.dataEditorOpen
-  }));
 
   render() {
     const {
@@ -99,7 +92,6 @@ class App extends Component {
       onFileChange, onBlockFocus, onPropertyChange, onPropertiesChange,
       onDiscardChanges, onBlockDelete, onCreateBlock
     } = this.props;
-    const { dataEditorOpen } = this.state;
     const { handleDataEditorOpen, handleDownload, handleSubmit } = this;
 
     const blocks = order && order.toJS().reduce( (accumulator, id, index) => {
@@ -124,7 +116,6 @@ class App extends Component {
           onFileChange={onFileChange}
           onSubmit={handleSubmit}
           onCreateBlock={onCreateBlock}
-          onDataEditorOpen={handleDataEditorOpen}
         />
         <Grid container spacing={8}>
           <Grid item xs={3}>
@@ -143,13 +134,12 @@ class App extends Component {
             <Paper style={{marginTop: '5px', height: '500px', overflowY: 'auto'}}>
               {block 
                 && <BlockEditor
-                  hidden={dataEditorOpen}
+                  hidden={false}
                   block={(block.get('modified') || block.get('origin')).toJS()}
                   onPropertyChange={onPropertyChange(id)}
                   onPropertiesChange={onPropertiesChange(id)}
                 />
               }
-              <DataEditor hidden={!dataEditorOpen}/>
             </Paper>
           </Grid>
         </Grid>

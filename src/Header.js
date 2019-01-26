@@ -6,7 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 
 
 const Header = (props) => {
-  const { onFileChange, onSubmit, onCreateBlock, onDataEditorOpen } = props;
+  const { onFileChange, onSubmit, onCreateBlock } = props;
   return (
     <AppBar position="static">
       <Toolbar>
@@ -22,11 +22,6 @@ const Header = (props) => {
         <IconButton color="inherit" onClick={onCreateBlock}>
           <AddIcon />
         </IconButton>
-        <Button
-          onClick={onDataEditorOpen}
-          color="inherit"
-          variant="contained"
-        >Data</Button>
       </Toolbar>
     </AppBar>
   )
