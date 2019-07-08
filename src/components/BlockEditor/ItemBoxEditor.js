@@ -59,7 +59,9 @@ class ItemBoxEditor extends Component{
     return expanded || nextProps.expanded;
   }
   componentDidUpdate = (preProps) => {
-    this.props.focusOn !== preProps.focusOn
+    const { focusOn, expanded } = this.props;
+    expanded
+      && (focusOn !== preProps.focusOn || preProps.expanded === false)
       && this.handleReset();
   }
   
